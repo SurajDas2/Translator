@@ -8,6 +8,7 @@ from .forms import UploadFileForm
 import pandas as pd
 import pdb
 import os
+from django.urls import reverse
 from translate import Translator
 
 def translate_view(request):
@@ -25,9 +26,9 @@ def translate_view(request):
                     for chunk in uploaded_file.chunks():
                         destination.write(chunk)
             df = pd.read_excel(file_path)
-        
             # Apply translation
-            translator = Translator(to_lang="hi")
+            language = request.POST.get('language')
+            translator = Translator(to_lang=language)
             df = df.applymap(lambda x: translator.translate(str(x)) if pd.notnull(x) else x)
             # Save to a new Excel file
             output_filename = os.path.splitext(file_path)[0] + '_translated.xlsx'
